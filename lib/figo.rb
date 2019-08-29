@@ -93,6 +93,9 @@ module Figo
     require_relative "./bank/model.rb"
     require_relative "./bank/api_call.rb"
 
+    require_relative "./catalog/model.rb"
+    require_relative "./catalog/api_call.rb"
+
     require_relative "./notification/model.rb"
     require_relative "./notification/api_call.rb"
 
@@ -163,9 +166,8 @@ module Figo
       response = @https.request(uri, request)
 
       # Evaluate HTTP response.
-      return nil if response.nil?
-      return nil if response.body.nil?
-      return response.body == "" ? nil : JSON.parse(response.body)
+      return nil if response.nil? || response.body.nil? || response.body.empty?
+      JSON.parse(response.body)
     end
 
     def query_api_object(type, path, data=nil, method="GET", array_name=nil) # :nodoc:

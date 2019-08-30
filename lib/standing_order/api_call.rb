@@ -17,13 +17,14 @@ module Figo
   # Get all standing orders.
   # @param cents [Boolean] - whether to show the balance in cents, Optional, default: false
   # @param account_id [String] - ID of account, Optional
+  # @param accounts [Array] - ID of accounts to retreived the standing orders, Optional, (cannot be used with account_id)
   # @return [StandingOrder] a list of `standing_order` objects.
   def get_standing_orders(account_id = nil, cents = false, accounts = nil)
-    options = {cents: cents, accounts: accounts}.delete_if{ |k, v| v.nil?}.to_query
     if account_id.nil?
+      options = {cents: cents, accounts: accounts}.delete_if{ |k, v| v.nil?}.to_query
       path =  "/rest/standing_orders?#{options}"
     else
-      path = "/rest/accounts/#{account_id}/standing_orders?#{options}"
+      path = "/rest/accounts/#{account_id}/standing_orders?cents=#{cents}"
     end
     query_api_object StandingOrder, path, nil, "GET", "standing_orders"
   end

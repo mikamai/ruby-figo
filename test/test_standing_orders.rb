@@ -12,8 +12,8 @@ class FigoTest < MiniTest::Unit::TestCase
   ##  Standing orders
   # Retrieve all Standing orders
   def test_retrieve_all_standing_orders
-    payments = figo_session.get_standing_orders()
+    standing_orders = figo_session.get_standing_orders()
 
-    assert payments.instance_of?(Array)
+    assert standing_orders.instance_of?(Array)
   end
 end

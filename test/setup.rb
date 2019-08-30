@@ -20,8 +20,8 @@ module Setup
 
   attr_reader :username, :password, :client_id, :client_secret
 
-  def access_token(t_scope)
-    response = figo_connection.user_credential_request(username, password, t_scope)
+  def access_token(scope)
+    response = figo_connection.user_credential_request(username, password, scope)
     response['access_token']
   end
 

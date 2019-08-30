@@ -28,6 +28,8 @@ require_relative "./helpers/error.rb"
 
 require_relative "./authentification/api_call.rb"
 
+require 'active_support/core_ext/object/to_query'
+
 # Ruby bindings for the figo Connect API: http://developer.figo.me
 module Figo
   $config = YAML.load_file(File.join(__dir__, '../config.yml'))
@@ -37,6 +39,9 @@ module Figo
   #
   # It's main purpose is to let user login via OAuth 2.0.
   class Connection
+    require_relative "./catalog/model.rb"
+    require_relative "./catalog/api_call.rb"
+
     include Figo
     # Create connection object with client credentials.
     #
@@ -72,6 +77,12 @@ module Figo
 
       # Evaluate HTTP response.
       response.body && !response.body.empty? ? JSON.parse(response.body) : nil
+    end
+
+    def query_api_object(type, path, data=nil, method="GET") # :nodoc:
+      response = query_api path, data, method
+      return nil if response.nil?
+      return type.new(self, response)
     end
 
     def get_version

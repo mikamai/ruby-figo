@@ -1,35 +1,30 @@
 # frozen_string_literal: true
 
 module Figo
-  # List complete catalog (user auth)
+
+  def self.included(klass)
+    @prefix = '/rest' if klass.to_s  == 'Session'
+  end
+
+  # List complete catalog (user auth or client auth.)
   # The real catalog contains thousands of entries, so expect the call to cause some traffic and delay.
   #
   # @param q [String] Two-letter country code. Show only resources within this country. Country code is case-insensitve.
   # @param country [String] Query for the entire catalog. Will match banks on domestic bank code, BIC, name or figo-ID. Will match services based on name or figo-ID. Only exact matches are returned.
+  # @params objects [Enum] "banks" or "services", decide what is included in the api response. If not specified, it returns both
   # @return [Catalog] modified bank object returned by server
-  def list_complete_catalog_user_auth(q:, country:)
-    list_complete_catalog(q, country, '/rest/catalog')
-  end
-
-  # List complete catalog (client_auth)
-  # The real catalog contains thousands of entries, so expect the call to cause some traffic and delay.
-  # @note: The client has to have the accounts=rw scope in order to retrieve the catalog.
-  # @param q [String] Two-letter country code. Show only resources within this country. Country code is case-insensitve.
-  # @param country [String] Query for the entire catalog. Will match banks on domestic bank code, BIC, name or figo-ID. Will match services based on name or figo-ID. Only exact matches are returned.
-  # @return [Catalog] modified bank object returned by server
-  def list_complete_catalog_client_auth(q:, country:)
-    list_complete_catalog(q, country, '/catalog')
+  def get_supported_payment_services(q: nil, country: nil, objects: nil)
+    list_catalog(q, country, complete_path("#{@prefix}/catalog", objects))
   end
 
   private
 
-  def list_complete_catalog(q, country, path)
-    q_param = !q.nil? && !q.empty? ? "?q=#{q}" : nil
-    country_param = nil
-    if !country.nil? && !country.empty?
-      country_param = q_param ? "&country=#{country}" : "?country=#{country}"
-    end
+  def list_catalog(q, country, path)
+    options = {q: q, country: country}.delete_if{|k, v| v.nil?}
+    query_api_object Catalog, "#{path}?#{options.to_query}"
+  end
 
-    query_api_object Catalog, [path, q_param, country_param].join
+  def complete_path path, objects
+    ["banks", "services"].include?(objects) ? "#{path}/#{objects}" : path
   end
 end

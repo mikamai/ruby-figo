@@ -57,6 +57,16 @@ module Figo
     query_api("/rest/accounts/" + payment.account_id + "/payments/" + payment.payment_id + "/init", params, "POST")
   end
 
+  # Get payment initation status
+  #
+  # @param account_id [String] figoID for the account on which the payment was created, Required
+  # @param payment_id [String] figo ID of the payment to retrieve the initiation status for, Required
+  # @param init_id [String] figo ID of the payment initation, Required
+  # @return [Object] Initiation status of the payment
+  def submit_payment (account_id, payment_id, init_id)
+    query_api("/rest/accounts/#{account_id}/payments/#{payment_id}/init#{init_id}", nil, "GET")
+  end
+
   # Remove payment
   #
   # @param payment [Payment, String] payment object which should be removed
